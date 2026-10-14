@@ -38,7 +38,7 @@ public class projectile : MonoBehaviour
             return;
         }
 
-        // Prevent the projectile from colliding with the player that fired it,
+        // Prevent the projectile from colliding with the object that fired it,
         // including any colliders attached to child objects.
         Collider2D[] ownerColliders = owner.GetComponentsInChildren<Collider2D>(true);
         foreach (Collider2D ownerCollider in ownerColliders)
@@ -48,6 +48,11 @@ public class projectile : MonoBehaviour
                 Physics2D.IgnoreCollision(boxCollider, ownerCollider, true);
             }
         }
+    }
+
+    public void SetSpeed(float newSpeed)
+    {
+        speed = Mathf.Max(0f, newSpeed);
     }
 
     public void SetDirection(Vector2 newDirection)
@@ -103,7 +108,26 @@ public class projectile : MonoBehaviour
             wall.HitByProjectile();
         }
 
+        // Player shots damage the Masked enemy (each hit removes one hit point).
+        MaskedEnemy enemy = other.GetComponentInParent<MaskedEnemy>();
+        if (enemy != null && IsFiredBy<PlayerMovement>())
+        {
+            enemy.TakeHit();
+        }
+
+        // Enemy shots damage the player (one damage per shot).
+        Health health = other.GetComponentInParent<Health>();
+        if (health != null && IsFiredBy<MaskedEnemy>())
+        {
+            health.TakeDamage(1f);
+        }
+
         HandleHit();
+    }
+
+    private bool IsFiredBy<T>() where T : Component
+    {
+        return owner != null && owner.GetComponent<T>() != null;
     }
 
     private void HandleHit()
