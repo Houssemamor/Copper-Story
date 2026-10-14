@@ -21,13 +21,17 @@ public class MaskedEnemy : MonoBehaviour
     [SerializeField] private float projectileSpeed = 6f;
     [Tooltip("Horizontal distance from the enemy's centre where shots spawn.")]
     [SerializeField] private float fireOffsetX = 1.2f;
-    [Tooltip("Height of the shot above the enemy's feet. Keep low enough to jump over.")]
-    [SerializeField] private float fireHeightAboveFeet = 0.4f;
+    [Tooltip("Min height of the shot above the enemy's feet.")]
+    [SerializeField] private float minFireHeightAboveFeet = 0f;
+    [Tooltip("Max height of the shot above the enemy's feet.")]
+    [SerializeField] private float maxFireHeightAboveFeet = 1f;
     [SerializeField] private Color projectileColor = new Color(0.2f, 1f, 0.2f, 1f);
 
     [Header("Hit Flash")]
     [SerializeField] private float flashDuration = 0.2f;
     [SerializeField] private int flashCount = 2;
+    [Tooltip("Optional. If left empty, Shader.Find(\"Sprites/WhiteFlash\") is used.")]
+    [SerializeField] private Shader flashShader;
 
     private Rigidbody2D body;
     private SpriteRenderer spriteRenderer;
@@ -119,6 +123,9 @@ public class MaskedEnemy : MonoBehaviour
 
     private IEnumerator FlashWhite()
     {
+        // Make sure we don't inherit a stuck "on" state from an interrupted flash.
+        flashOverlay.enabled = false;
+
         for (int i = 0; i < flashCount; i++)
         {
             flashOverlay.enabled = true;
@@ -161,7 +168,7 @@ public class MaskedEnemy : MonoBehaviour
 
         if (player == null)
         {
-            player = FindFirstObjectByType<PlayerMovement>();
+            player = FindAnyObjectByType<PlayerMovement>();
         }
         if (player == null)
         {
@@ -171,7 +178,10 @@ public class MaskedEnemy : MonoBehaviour
         // Straight horizontal shot toward the player's side.
         float dirX = player.transform.position.x >= transform.position.x ? 1f : -1f;
 
-        GameObject shot = Instantiate(projectilePrefab, GetFirePosition(dirX), Quaternion.identity);
+        // Randomize shot height so the player must react (jump or crouch).
+        float heightJitter = Random.Range(minFireHeightAboveFeet, maxFireHeightAboveFeet);
+
+        GameObject shot = Instantiate(projectilePrefab, GetFirePosition(dirX, heightJitter), Quaternion.identity);
         shot.SetActive(true);
 
         SpriteRenderer shotRenderer = shot.GetComponentInChildren<SpriteRenderer>();
@@ -193,12 +203,12 @@ public class MaskedEnemy : MonoBehaviour
         }
     }
 
-    private Vector3 GetFirePosition(float dirX)
+    private Vector3 GetFirePosition(float dirX, float heightJitter)
     {
         float feetY = bodyCollider != null ? bodyCollider.bounds.min.y : transform.position.y;
         return new Vector3(
             transform.position.x + dirX * fireOffsetX,
-            feetY + fireHeightAboveFeet,
+            feetY + heightJitter,
             0f);
     }
 
@@ -212,6 +222,20 @@ public class MaskedEnemy : MonoBehaviour
         flashOverlay.sortingLayerID = spriteRenderer.sortingLayerID;
         flashOverlay.sortingOrder = spriteRenderer.sortingOrder + 1;
         flashOverlay.color = Color.white;
+
+        Shader shader = flashShader != null ? flashShader : Shader.Find("Sprites/WhiteFlash");
+        if (shader != null)
+        {
+            flashOverlay.sharedMaterial = new Material(shader);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "MaskedEnemy: WhiteFlash shader not found. Assign it to 'flashShader' " +
+                "in the inspector, or place it in a Resources folder and include it in " +
+                "Always Included Shaders so Shader.Find works in a build.");
+        }
+
         flashOverlay.enabled = false;
     }
 }

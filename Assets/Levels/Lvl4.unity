@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Goal
       objectReference: {fileID: 0}
+    - target: {fileID: 214459575346308204, guid: 22e5ac150703cd14e8c49e88739dccab, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3746894410053026206, guid: 22e5ac150703cd14e8c49e88739dccab, type: 3}
       propertyPath: nextSceneName
       value: Lvl3
@@ -378,12 +382,14 @@ MonoBehaviour:
   projectilePrefab: {fileID: 1353365962}
   firstShotDelay: 1.5
   shotInterval: 2
-  projectileSpeed: 6
+  projectileSpeed: 5
   fireOffsetX: 1.2
-  fireHeightAboveFeet: 0.4
+  minFireHeightAboveFeet: 0
+  maxFireHeightAboveFeet: 1
   projectileColor: {r: 0.2, g: 1, b: 0.2, a: 1}
-  flashDuration: 0.2
+  flashDuration: 0.1
   flashCount: 2
+  flashShader: {fileID: 101, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &149811236
 GameObject:
   m_ObjectHideFlags: 0
@@ -704,7 +710,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ead5e027381cc783bae0e680107c7fd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 5
+  startingHealth: 3
   invulnerableTime: 1
 --- !u!1 &519420028
 GameObject:
