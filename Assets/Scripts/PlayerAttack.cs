@@ -6,6 +6,8 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 0.5f;
     [SerializeField] private string attackTriggerName = "attack";
     [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform firePoint;
 
     private Animator animator;
     private PlayerMovement playerMovement;
@@ -126,5 +128,27 @@ public class PlayerAttack : MonoBehaviour
         {
             animator.SetTrigger(attackTriggerName);
         }
+
+        if (projectilePrefab != null)
+        {
+            Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
+            GameObject spawnedProjectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+            spawnedProjectile.SetActive(true);
+
+            float facing = transform.localScale.x >= 0f ? 1f : -1f;
+            Vector2 direction = new Vector2(facing, 0f);
+
+            projectile projectileComponent = spawnedProjectile.GetComponent<projectile>();
+            if (projectileComponent != null)
+            {
+                projectileComponent.SetDirection(direction);
+            }
+
+            Vector3 projectileScale = spawnedProjectile.transform.localScale;
+            projectileScale.x = Mathf.Abs(projectileScale.x) * facing;
+            spawnedProjectile.transform.localScale = projectileScale;
+        }
+
     }
+
 }
