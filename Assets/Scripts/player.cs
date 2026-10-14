@@ -118,6 +118,11 @@ public class PlayerMovement : MonoBehaviour
    
     private void Update()
     {
+        if (!GameManager.IsPlaying)
+        {
+            return;
+        }
+
         horizontalInput = 0f;
         bool jumpPressedThisFrame = false;
 

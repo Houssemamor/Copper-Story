@@ -65,6 +65,11 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
+        if (!GameManager.IsPlaying)
+        {
+            return;
+        }
+
         if (cooldownRemaining > 0f)
         {
             cooldownRemaining -= Time.deltaTime;
