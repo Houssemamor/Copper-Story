@@ -7,7 +7,8 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D body;
     private Animator anim;
     private bool grounded;
-    
+    private float horizontalInput;
+
     [SerializeField] private InputActionAsset inputActions;
     
     
@@ -117,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
    
     private void Update()
     {
-        float horizontalInput = 0f;
+        horizontalInput = 0f;
         bool jumpPressedThisFrame = false;
 
         if (moveAction != null)
@@ -283,4 +284,11 @@ public class PlayerMovement : MonoBehaviour
         }
         return null;
     }
+
+    public bool canAttack()
+    {
+        // Attack is only allowed while the player is grounded and not moving horizontally.
+        return grounded && Mathf.Approximately(horizontalInput, 0f);
+    }
 }
+
