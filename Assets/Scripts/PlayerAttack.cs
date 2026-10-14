@@ -146,6 +146,7 @@ public class PlayerAttack : MonoBehaviour
             projectile projectileComponent = spawnedProjectile.GetComponent<projectile>();
             if (projectileComponent != null)
             {
+                projectileComponent.SetOwner(gameObject);
                 projectileComponent.SetDirection(direction);
             }
 

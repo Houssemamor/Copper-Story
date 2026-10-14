@@ -1,27 +1,40 @@
 using UnityEngine;
 
-// Rotates 180° when hit by player projectile
+// Attach this component to the visible wooden wall root. The wall's own collider
+// (or a collider on a child) rotates together with the sprite when hit by a projectile.
+[DisallowMultipleComponent]
 public class WoodWall : MonoBehaviour
 {
-    [SerializeField] private float rotationAngle = 180f;
-    [SerializeField] private float rotationSpeed = 360f; // deg/s
+    [SerializeField] private float rotationAngle = -90f;
+    [SerializeField] private float rotationSpeed = 360f;
 
+    private Rigidbody2D body;
     private bool rotating;
     private float targetRotation;
-    private Quaternion startRotation;
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void Awake()
     {
-        var projectile = other.GetComponent<projectile>();
-        if (projectile == null)
+        body = GetComponent<Rigidbody2D>();
+        if (body == null)
         {
-            return;
+            body = gameObject.AddComponent<Rigidbody2D>();
         }
 
-        Rotate();
+        body.bodyType = RigidbodyType2D.Kinematic;
+        body.gravityScale = 0f;
+        body.useFullKinematicContacts = true;
+
+        // A rotating barrier must have solid collision geometry.
+        foreach (Collider2D wallCollider in GetComponentsInChildren<Collider2D>(true))
+        {
+            if (wallCollider != null)
+            {
+                wallCollider.isTrigger = false;
+            }
+        }
     }
 
-    private void Rotate()
+    public void HitByProjectile()
     {
         if (rotating)
         {
@@ -29,24 +42,26 @@ public class WoodWall : MonoBehaviour
         }
 
         rotating = true;
-        startRotation = transform.rotation;
-        targetRotation = startRotation.eulerAngles.z + rotationAngle;
+        targetRotation = body.rotation + rotationAngle;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        if (!rotating)
+        if (!rotating || body == null)
         {
             return;
         }
 
-        float currentZ = transform.rotation.eulerAngles.z;
-        float step = rotationSpeed * Time.deltaTime;
-        float newZ = Mathf.MoveTowardsAngle(currentZ, targetRotation, step);
-        transform.rotation = Quaternion.Euler(0f, 0f, newZ);
+        float nextRotation = Mathf.MoveTowardsAngle(
+            body.rotation,
+            targetRotation,
+            Mathf.Max(0f, rotationSpeed) * Time.fixedDeltaTime);
 
-        if (Mathf.Approximately(Mathf.DeltaAngle(currentZ, targetRotation), 0f))
+        body.MoveRotation(nextRotation);
+
+        if (Mathf.Abs(Mathf.DeltaAngle(nextRotation, targetRotation)) <= 0.01f)
         {
+            body.MoveRotation(targetRotation);
             rotating = false;
         }
     }
