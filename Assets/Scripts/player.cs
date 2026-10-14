@@ -3,11 +3,16 @@ using UnityEngine.InputSystem;
  
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private float jumpSoundVolume = 1f;
+
     [SerializeField] private float speed = 5f;
     private Rigidbody2D body;
     private Animator anim;
     private bool grounded;
     private float horizontalInput;
+    private AudioSource audioSource;
 
     [SerializeField] private InputActionAsset inputActions;
     
@@ -37,6 +42,14 @@ public class PlayerMovement : MonoBehaviour
             {
                 Debug.LogWarning("Player controller is missing required Animator parameters. Add 'run' and 'grounded' (bool) plus 'jump' (trigger) to the Animator Controller, case-sensitive matching isn't required.", this);
             }
+        }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f; // 2D sound
         }
         
         if (inputActions == null)
@@ -236,6 +249,10 @@ public class PlayerMovement : MonoBehaviour
         if (anim != null && !string.IsNullOrEmpty(jumpParamName))
         {
             anim.SetTrigger(jumpParamName);
+        }
+        if (jumpSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(jumpSound, jumpSoundVolume);
         }
         grounded = false;
     }

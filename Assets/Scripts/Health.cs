@@ -4,6 +4,12 @@ using UnityEngine;
 // Float-based health with animator triggers for hurt/die states
 public class Health : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip hurtSound;
+    [SerializeField] private float hurtSoundVolume = 1f;
+    [SerializeField] private AudioClip dieSound;
+    [SerializeField] private float dieSoundVolume = 1f;
+
     [SerializeField] private float startingHealth = 3f;
     public float CurrentHealth { get; private set; }
     public float MaxHealth => startingHealth;
@@ -12,12 +18,21 @@ public class Health : MonoBehaviour
     private bool dead;
     private float invulnerableTimer;
     [SerializeField] private float invulnerableTime = 1f;
+    private AudioSource audioSource;
 
     private void Awake()
     {
         CurrentHealth = startingHealth;
         animator = GetComponent<Animator>();
         dead = false;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
+        }
     }
 
     private void Update()
@@ -46,6 +61,10 @@ public class Health : MonoBehaviour
         if (CurrentHealth > 0f)
         {
             animator?.SetTrigger("hurt");
+            if (hurtSound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(hurtSound, hurtSoundVolume);
+            }
         }
         else
         {
@@ -68,6 +87,11 @@ public class Health : MonoBehaviour
         dead = true;
         CurrentHealth = 0f;
         animator?.SetTrigger("die");
+
+        if (dieSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(dieSound, dieSoundVolume);
+        }
 
         var movement = GetComponent<PlayerMovement>();
         if (movement != null)

@@ -1,46 +1,33 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Controls the game flow: Main Menu -> Playing -> Game Over / Won.
-// Created automatically when a scene loads, so no scene setup is required.
 public class GameManager : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip themeSong;
+    [SerializeField] private float themeSongVolume = 0.5f;
+    [SerializeField] private bool playThemeOnStart = true;
+
     public enum State { MainMenu, Playing, GameOver, Won }
 
     public static GameManager Instance { get; private set; }
 
-    // True when gameplay should be running. Also true when no GameManager exists,
-    // so the game still works if this script is removed.
     public static bool IsPlaying => Instance == null || Instance.state == State.Playing;
 
     public State CurrentState => state;
 
-    // Time spent playing this level. Only counts while the game is in the Playing state.
     public float ElapsedTime { get; private set; }
 
-    // Set by levels that use the win timer (shows the timer on the HUD).
     public bool TimerEnabled { get; private set; }
 
-    // Static so it survives the scene reload used for Restart / Main Menu.
     private static bool showMenuOnNextLoad = true;
 
     private State state = State.MainMenu;
     private GameUI ui;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void Bootstrap()
-    {
-        if (Instance != null)
-        {
-            return;
-        }
-        new GameObject("GameManager").AddComponent<GameManager>();
-    }
+    private AudioSource musicSource;
 
     private void Awake()
     {
-        // Enforce a single, persistent GameManager across scene loads so the HUD
-        // (and the rest of the UI) survive level transitions.
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -50,6 +37,18 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         ui = gameObject.AddComponent<GameUI>();
+
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.playOnAwake = false;
+        musicSource.loop = true;
+        musicSource.spatialBlend = 0.0f;
+        musicSource.volume = themeSongVolume;
+
+        if (themeSong != null && playThemeOnStart)
+        {
+            musicSource.clip = themeSong;
+            musicSource.Play();
+        }
     }
 
     private void OnEnable()
@@ -69,12 +68,20 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // A freshly loaded level starts from a clean run state.
-        ElapsedTime = 0f;
+        ElapsedTime = 0.0f;
         TimerEnabled = false;
-        Time.timeScale = 1f;
+        Time.timeScale = 1.0f;
 
-        // Re-bind the UI to the (new) player in this scene.
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            CameraFollow follow = mainCam.GetComponent<CameraFollow>();
+            if (follow == null)
+            {
+                mainCam.gameObject.AddComponent<CameraFollow>();
+            }
+        }
+
         if (ui != null)
         {
             ui.ResetPlayerReference();
@@ -93,8 +100,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Re-attach / reset player health after a scene load, since the previous
-    // player object was destroyed and a new one exists in the new scene.
     private void ResetPlayerForScene()
     {
         PlayerMovement player = FindAnyObjectByType<PlayerMovement>();
@@ -113,10 +118,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        var player = FindFirstObjectByType<PlayerMovement>();
+        PlayerMovement player = FindAnyObjectByType<PlayerMovement>();
         if (player != null)
         {
-            var health = player.GetComponent<Health>();
+            Health health = player.GetComponent<Health>();
             if (health == null)
             {
                 health = player.gameObject.AddComponent<Health>();
@@ -124,7 +129,7 @@ public class GameManager : MonoBehaviour
             health.ResetHealth();
         }
 
-        Time.timeScale = 1f;
+        Time.timeScale = 1.0f;
 
         if (showMenuOnNextLoad)
         {
@@ -150,7 +155,17 @@ public class GameManager : MonoBehaviour
         {
             Instance = null;
         }
-        Time.timeScale = 1f;
+        Time.timeScale = 1.0f;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (Instance != null)
+        {
+            return;
+        }
+        new GameObject("GameManager").AddComponent<GameManager>();
     }
 
     public static void RequestStartGame()
@@ -175,33 +190,27 @@ public class GameManager : MonoBehaviour
 
     public static void RequestQuit()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
         Application.Quit();
-#endif
     }
 
     private static void ReloadLevelStatic()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void ShowMainMenu()
     {
         state = State.MainMenu;
-        Time.timeScale = 0f;
+        Time.timeScale = 0.0f;
         ui?.ShowMainMenu();
     }
 
     public void StartGame()
     {
-        // Starting gameplay means subsequent scene loads should also play,
-        // not show the main menu.
         showMenuOnNextLoad = false;
         state = State.Playing;
-        Time.timeScale = 1f;
+        Time.timeScale = 1.0f;
         ui?.ShowPlaying();
     }
 
@@ -217,12 +226,10 @@ public class GameManager : MonoBehaviour
             return;
         }
         state = State.GameOver;
-        Time.timeScale = 0f;
+        Time.timeScale = 0.0f;
         ui?.ShowGameOver();
     }
 
-    // Called when the level is completed. Saves the time to the device leaderboard
-    // and shows the win screen.
     public void Win(string levelKey)
     {
         if (state != State.Playing)
@@ -231,7 +238,7 @@ public class GameManager : MonoBehaviour
         }
 
         state = State.Won;
-        Time.timeScale = 0f;
+        Time.timeScale = 0.0f;
 
         int place = Leaderboard.Submit(levelKey, ElapsedTime);
         ui?.ShowWin(ElapsedTime, levelKey, place);

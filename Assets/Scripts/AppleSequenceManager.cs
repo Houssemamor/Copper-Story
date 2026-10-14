@@ -2,6 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Level 3 puzzle: collect apples in the configured order before the goal becomes usable.
+/// If the wrong apple is collected, all previously collected apples respawn and the sequence restarts.
 /// </summary>
 public class AppleSequenceManager : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class AppleSequenceManager : MonoBehaviour
     [SerializeField] private GameObject goalObject;
 
     private int nextSequenceIndex;
+    private AppleCollectible[] allApples;
+    private bool[] collectedFlags;
     private SpriteRenderer[] goalRenderers;
     private Collider2D[] goalColliders;
     private Animator[] goalAnimators;
@@ -22,6 +25,10 @@ public class AppleSequenceManager : MonoBehaviour
 
     private void Start()
     {
+        // Find all apples in the scene and cache their initial state.
+        allApples = FindObjectsByType<AppleCollectible>(FindObjectsInactive.Include);
+        collectedFlags = new bool[allApples.Length];
+
         // Keep the goal hidden and non-interactive until the full sequence is correct.
         SetGoalEnabled(false);
     }
@@ -36,7 +43,8 @@ public class AppleSequenceManager : MonoBehaviour
         int expectedNumber = requiredSequence[nextSequenceIndex];
         if (apple.AppleNumber != expectedNumber)
         {
-            Debug.Log($"Level 3: collect Apple {expectedNumber} next. Apple {apple.AppleNumber} was not collected.", apple);
+            Debug.Log($"Level 3: wrong apple ({apple.AppleNumber}), expected {expectedNumber}. Resetting sequence.", apple);
+            ResetSequence();
             return false;
         }
 
@@ -54,6 +62,37 @@ public class AppleSequenceManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private void ResetSequence()
+    {
+        nextSequenceIndex = 0;
+
+        // Respawn all apples that were collected.
+        for (int i = 0; i < allApples.Length; i++)
+        {
+            if (collectedFlags[i] && allApples[i] != null)
+            {
+                allApples[i].Respawn();
+                collectedFlags[i] = false;
+            }
+        }
+
+        Debug.Log("Level 3: sequence reset. All apples respawned.", this);
+    }
+
+    // Called by AppleCollectible when it gets collected so we can track it.
+    public void RegisterCollected(AppleCollectible apple)
+    {
+        if (allApples == null) return;
+        for (int i = 0; i < allApples.Length; i++)
+        {
+            if (allApples[i] == apple)
+            {
+                collectedFlags[i] = true;
+                break;
+            }
+        }
     }
 
     private void CacheGoalComponents()

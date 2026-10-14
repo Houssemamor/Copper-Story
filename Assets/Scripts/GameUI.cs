@@ -43,7 +43,9 @@ public class GameUI : MonoBehaviour
         var scaler = canvasGO.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
+        // Match height so UI stays readable on any aspect ratio; width scales to fit.
+        scaler.matchWidthOrHeight = 1f;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
 
         BuildHud(canvasGO.transform);
         mainMenuPanel = BuildMainMenu(canvasGO.transform);

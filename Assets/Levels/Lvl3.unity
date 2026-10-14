@@ -382,6 +382,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0d6edd15911584e89ad6ada6541f93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::player
+  jumpSound: {fileID: 8300000, guid: d523f3bb09ea6bfaa91332345c3eb21e, type: 3}
+  jumpSoundVolume: 1
   speed: 5
   inputActions: {fileID: 0}
 --- !u!70 &168005173
@@ -548,7 +550,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 2
+  orthographic size: 2.4769835
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -897,6 +899,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1071106951}
   - component: {fileID: 1071106950}
+  - component: {fileID: 1071106952}
   m_Layer: 0
   m_Name: Terrain (16x16)_10
   m_TagString: Untagged
@@ -979,6 +982,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1129060111}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1071106952
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071106949}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 7
 --- !u!1 &1129060108
 GameObject:
   m_ObjectHideFlags: 0
@@ -1321,6 +1351,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1503099551}
   - component: {fileID: 1503099550}
+  - component: {fileID: 1503099552}
   m_Layer: 0
   m_Name: Terrain (16x16)_10 (1)
   m_TagString: Untagged
@@ -1403,6 +1434,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1129060111}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1503099552
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503099549}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 7
 --- !u!1 &1850896451
 GameObject:
   m_ObjectHideFlags: 0
@@ -1601,6 +1659,98 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 2}
   m_EdgeRadius: 0
+--- !u!1 &1909885850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1909885852}
+  - component: {fileID: 1909885851}
+  m_Layer: 0
+  m_Name: pixel-art-seamless-background-with-mountains_0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &1909885851
+SpriteRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909885850}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: -10
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 161623318607164653, guid: 1d6d5fcda9e105bcd8707016a6d4bde8, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 6.12, y: 3.44}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
+--- !u!4 &1909885852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909885850}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0556, y: -0.0083, z: 0}
+  m_LocalScale: {x: 1.6718, y: 1.2839, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1954800270
 GameObject:
   m_ObjectHideFlags: 0
@@ -2074,7 +2224,7 @@ Transform:
   m_GameObject: {fileID: 880000000011}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.25, y: -0.1, z: 0}
+  m_LocalPosition: {x: 0.23, y: -0.43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2188,6 +2338,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e670fcfe301946f4a13ec83190031a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppleCollectible
+  collectSound: {fileID: 8300000, guid: 21b10f53a7a7be340920b012924fe374, type: 3}
+  collectSoundVolume: 1
   appleNumber: 2
 --- !u!1 &880000000021
 GameObject:
@@ -2217,7 +2369,7 @@ Transform:
   m_GameObject: {fileID: 880000000021}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.41, y: -0.15, z: 0}
+  m_LocalPosition: {x: -1.39, y: -0.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2331,6 +2483,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e670fcfe301946f4a13ec83190031a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppleCollectible
+  collectSound: {fileID: 8300000, guid: 21b10f53a7a7be340920b012924fe374, type: 3}
+  collectSoundVolume: 1
   appleNumber: 1
 --- !u!1 &880000000031
 GameObject:
@@ -2360,7 +2514,7 @@ Transform:
   m_GameObject: {fileID: 880000000031}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.9, y: -0.13, z: 0}
+  m_LocalPosition: {x: 1.9, y: -0.01, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2474,6 +2628,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e670fcfe301946f4a13ec83190031a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppleCollectible
+  collectSound: {fileID: 8300000, guid: 21b10f53a7a7be340920b012924fe374, type: 3}
+  collectSoundVolume: 1
   appleNumber: 3
 --- !u!1001 &6045146327741047963
 PrefabInstance:
@@ -2550,3 +2706,4 @@ SceneRoots:
   - {fileID: 880000000012}
   - {fileID: 880000000032}
   - {fileID: 880000000002}
+  - {fileID: 1909885852}

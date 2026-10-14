@@ -6,6 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class AppleCollectible : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip collectSound;
+    [SerializeField] private float collectSoundVolume = 1f;
+
     [SerializeField, Range(1, 3)] private int appleNumber = 1;
 
     private bool collected;
@@ -45,7 +49,16 @@ public class AppleCollectible : MonoBehaviour
             return;
         }
 
-        sequenceManager.TryCollect(this);
+        if (sequenceManager.TryCollect(this))
+        {
+            collected = true;
+            sequenceManager.RegisterCollected(this);
+            if (collectSound != null)
+            {
+                AudioSource.PlayClipAtPoint(collectSound, transform.position, collectSoundVolume);
+            }
+            gameObject.SetActive(false);
+        }
     }
 
     public void MarkCollected()
@@ -57,6 +70,17 @@ public class AppleCollectible : MonoBehaviour
 
         collected = true;
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Reactivates the apple so it can be collected again (used when sequence resets).
+    /// </summary>
+    public void Respawn()
+    {
+        if (!collected) return;
+
+        collected = false;
+        gameObject.SetActive(true);
     }
 
     private void CreateNumberLabel()
