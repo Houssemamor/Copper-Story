@@ -4,7 +4,7 @@ using UnityEngine;
 // Enable "Is Trigger" for pass-through damage, or leave it off to damage on touch.
 public class DamageZone : MonoBehaviour
 {
-    [SerializeField] private int damage = 1;
+    [SerializeField] private float damage = 1f;
     [SerializeField] private bool killInstantly;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -19,7 +19,7 @@ public class DamageZone : MonoBehaviour
 
     private void TryDamage(Collider2D other)
     {
-        var health = other.GetComponentInParent<PlayerHealth>();
+        var health = other.GetComponentInParent<Health>();
         if (health == null)
         {
             return;

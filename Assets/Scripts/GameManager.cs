@@ -40,10 +40,17 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         var player = FindFirstObjectByType<PlayerMovement>();
-        if (player != null && player.GetComponent<PlayerHealth>() == null)
+        if (player != null)
         {
-            player.gameObject.AddComponent<PlayerHealth>();
+            var health = player.GetComponent<Health>();
+            if (health == null)
+            {
+                health = player.gameObject.AddComponent<Health>();
+            }
+            health.ResetHealth();
         }
+
+        Time.timeScale = 1f;
 
         if (showMenuOnNextLoad)
         {
@@ -64,18 +71,53 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public static void RequestStartGame()
+    {
+        if (Instance != null)
+        {
+            Instance.StartGame();
+        }
+    }
+
+    public static void RequestRestart()
+    {
+        showMenuOnNextLoad = false;
+        ReloadLevelStatic();
+    }
+
+    public static void RequestMainMenu()
+    {
+        showMenuOnNextLoad = true;
+        ReloadLevelStatic();
+    }
+
+    public static void RequestQuit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    private static void ReloadLevelStatic()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public void ShowMainMenu()
     {
         state = State.MainMenu;
         Time.timeScale = 0f;
-        ui.ShowMainMenu();
+        ui?.ShowMainMenu();
     }
 
     public void StartGame()
     {
         state = State.Playing;
         Time.timeScale = 1f;
-        ui.ShowPlaying();
+        ui?.ShowPlaying();
     }
 
     public void GameOver()
@@ -86,33 +128,21 @@ public class GameManager : MonoBehaviour
         }
         state = State.GameOver;
         Time.timeScale = 0f;
-        ui.ShowGameOver();
+        ui?.ShowGameOver();
     }
 
     public void Restart()
     {
-        showMenuOnNextLoad = false;
-        ReloadLevel();
+        RequestRestart();
     }
 
     public void ReturnToMainMenu()
     {
-        showMenuOnNextLoad = true;
-        ReloadLevel();
+        RequestMainMenu();
     }
 
     public void QuitGame()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-    }
-
-    private void ReloadLevel()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        RequestQuit();
     }
 }

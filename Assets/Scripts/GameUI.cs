@@ -10,9 +10,9 @@ public class GameUI : MonoBehaviour
     private GameObject mainMenuPanel;
     private GameObject gameOverPanel;
     private GameObject hudPanel;
-    private Text hpText;
+    private Image healthBarFill;
     private Font font;
-    private PlayerHealth playerHealth;
+    private Health playerHealth;
 
     private void Awake()
     {
@@ -38,11 +38,11 @@ public class GameUI : MonoBehaviour
     {
         if (playerHealth == null)
         {
-            playerHealth = FindFirstObjectByType<PlayerHealth>();
+            playerHealth = FindFirstObjectByType<Health>();
         }
-        if (hpText != null && playerHealth != null)
+        if (healthBarFill != null && playerHealth != null)
         {
-            hpText.text = "HP  " + playerHealth.CurrentHealth + " / " + playerHealth.MaxHealth;
+            healthBarFill.fillAmount = playerHealth.CurrentHealth / playerHealth.MaxHealth;
         }
     }
 
@@ -73,8 +73,8 @@ public class GameUI : MonoBehaviour
         var panel = CreatePanel("MainMenu Panel", parent, new Color(0.05f, 0.05f, 0.08f, 0.95f));
 
         CreateText(panel.transform, "COPPER STORY", 120, new Vector2(0, 250), Color.white);
-        CreateButton(panel.transform, "Play", new Vector2(0, 40), () => GameManager.Instance.StartGame());
-        CreateButton(panel.transform, "Quit", new Vector2(0, -60), () => GameManager.Instance.QuitGame());
+        CreateButton(panel.transform, "Play", new Vector2(0, 40), GameManager.RequestStartGame);
+        CreateButton(panel.transform, "Quit", new Vector2(0, -60), GameManager.RequestQuit);
 
         return panel;
     }
@@ -84,8 +84,8 @@ public class GameUI : MonoBehaviour
         var panel = CreatePanel("GameOver Panel", parent, new Color(0f, 0f, 0f, 0.75f));
 
         CreateText(panel.transform, "GAME OVER", 130, new Vector2(0, 200), new Color(0.9f, 0.2f, 0.2f));
-        CreateButton(panel.transform, "Restart", new Vector2(0, 0), () => GameManager.Instance.Restart());
-        CreateButton(panel.transform, "Main Menu", new Vector2(0, -100), () => GameManager.Instance.ReturnToMainMenu());
+        CreateButton(panel.transform, "Restart", new Vector2(0, 0), GameManager.RequestRestart);
+        CreateButton(panel.transform, "Main Menu", new Vector2(0, -100), GameManager.RequestMainMenu);
 
         return panel;
     }
@@ -96,13 +96,39 @@ public class GameUI : MonoBehaviour
         hudPanel.transform.SetParent(parent, false);
         Stretch(hudPanel.GetComponent<RectTransform>());
 
-        hpText = CreateText(hudPanel.transform, "HP", 48, Vector2.zero, Color.white).GetComponent<Text>();
-        var rt = hpText.GetComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
-        rt.pivot = new Vector2(0f, 1f);
-        rt.anchoredPosition = new Vector2(30, -30);
-        rt.sizeDelta = new Vector2(400, 80);
-        hpText.alignment = TextAnchor.UpperLeft;
+        // Health bar background
+        var barBg = new GameObject("HealthBar Background", typeof(RectTransform), typeof(Image));
+        barBg.transform.SetParent(hudPanel.transform, false);
+        var bgRect = barBg.GetComponent<RectTransform>();
+        bgRect.anchorMin = new Vector2(0f, 1f);
+        bgRect.anchorMax = new Vector2(0f, 1f);
+        bgRect.pivot = new Vector2(0f, 1f);
+        bgRect.anchoredPosition = new Vector2(30, -30);
+        bgRect.sizeDelta = new Vector2(200, 24);
+        barBg.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
+
+        // Health bar fill
+        var barFill = new GameObject("HealthBar Fill", typeof(RectTransform), typeof(Image));
+        barFill.transform.SetParent(barBg.transform, false);
+        var fillRect = barFill.GetComponent<RectTransform>();
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = Vector2.zero;
+        fillRect.offsetMax = Vector2.zero;
+        var fillImage = barFill.GetComponent<Image>();
+        fillImage.color = new Color(0.9f, 0.2f, 0.2f);
+        fillImage.type = Image.Type.Filled;
+        fillImage.fillMethod = Image.FillMethod.Horizontal;
+        fillImage.fillOrigin = 0;
+        healthBarFill = fillImage;
+
+        // HP label
+        var label = CreateText(barBg.transform, "HP", 20, new Vector2(-60, 0), Color.white);
+        var labelRect = label.GetComponent<RectTransform>();
+        labelRect.anchorMin = labelRect.anchorMax = new Vector2(0f, 0.5f);
+        labelRect.pivot = new Vector2(1f, 0.5f);
+        labelRect.anchoredPosition = new Vector2(-10, 0);
+        label.GetComponent<Text>().alignment = TextAnchor.MiddleRight;
 
         hudPanel.SetActive(false);
     }
